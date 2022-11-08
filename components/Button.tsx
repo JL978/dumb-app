@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -10,17 +11,24 @@ const Button = ({
   onPress,
   style = {},
 }: {
-  children: string;
+  children: React.ReactNode | string;
   onPress: () => void;
   style?: TouchableOpacityProps['style'];
 }) => {
   const color = useThemeColor({}, 'primary');
 
+  const content =
+    typeof children === 'string' ? (
+      <Text style={[styles.buttonText]}>{children}</Text>
+    ) : (
+      children
+    );
+
   return (
     <TouchableOpacity
       onPress={onPress}
       style={[styles.button, { backgroundColor: color }, style]}>
-      <Text style={[styles.buttonText]}>{children}</Text>
+      {content}
     </TouchableOpacity>
   );
 };
@@ -32,6 +40,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 20,
     alignSelf: 'center',
+    justifyContent: 'center',
     marginTop: 40,
   },
   buttonText: {
