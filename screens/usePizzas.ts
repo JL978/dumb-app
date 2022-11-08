@@ -9,15 +9,15 @@ export type Pizza = {
 };
 
 export default function usePizzas() {
-  const [pizzas, setPizzas] = useAsyncStorage<Pizza[]>('pizzas', []);
+  const { data, isLoading, setValue } = useAsyncStorage<Pizza[]>('pizzas', []);
 
   const addPizza = (pizza: Pizza) => {
-    setPizzas((pizzas) => [...pizzas, pizza]);
+    setValue((pizzas) => [...pizzas, pizza]);
   };
 
   const removePizza = (id: string) => {
-    setPizzas((pizzas) => pizzas.filter((pizza) => pizza.id !== id));
+    setValue((pizzas) => pizzas.filter((pizza) => pizza.id !== id));
   };
 
-  return { pizzas, addPizza, removePizza };
+  return { pizzas: data, addPizza, removePizza };
 }
