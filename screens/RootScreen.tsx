@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    backgroundColor: '#f2f6f7',
   },
   pizzaTitle: {
     fontSize: 20,

@@ -1,19 +1,18 @@
-import { StatusBar } from 'expo-status-bar';
 import {
-  Platform,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   TextInputProps,
+  TouchableOpacityProps,
 } from 'react-native';
 
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View } from '../components/Themed';
+import { Text, useThemeColor, View } from '../components/Themed';
 import { RootStackScreenProps } from '../types';
 import { useReducer } from 'react';
-import useAsyncStorage from '../hooks/useAsyncStorage';
 import usePizzas from './usePizzas';
 import cuid from 'cuid';
+import { AntDesign } from '@expo/vector-icons';
+import Button from '../components/Button';
 
 type InputProps = {
   label: string;
@@ -22,11 +21,13 @@ type InputProps = {
 } & TextInputProps;
 
 const Input = ({ label, value, onChangeText, ...props }: InputProps) => {
+  const inputBackgroundColor = useThemeColor({}, 'inputBackground');
+
   return (
     <View style={styles.inputContainer}>
       <Text style={styles.inputLabel}>{label}</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: inputBackgroundColor }]}
         value={value}
         onChangeText={onChangeText}
         {...props}
@@ -89,7 +90,7 @@ export default function ModalScreen({
       <View style={styles.header}>
         <Text style={styles.title}>Add Yo Pizza</Text>
         <TouchableOpacity onPress={onClose}>
-          <Text>Close</Text>
+          <AntDesign name="close" size={24} color="black" />
         </TouchableOpacity>
       </View>
       <View style={{ marginTop: 10 }}>
@@ -141,9 +142,9 @@ export default function ModalScreen({
           keyboardType="numeric"
         />
       </View>
-      <TouchableOpacity style={styles.button} onPress={onAdd}>
-        <Text style={styles.buttonText}>Add</Text>
-      </TouchableOpacity>
+      <Button onPress={onAdd} style={{ width: '60%' }}>
+        Add
+      </Button>
     </View>
   );
 }
@@ -189,7 +190,6 @@ const styles = StyleSheet.create({
     borderRadius: 1000,
     width: '60%',
     paddingVertical: 8,
-    color: 'red',
     alignSelf: 'center',
     marginTop: 40,
   },
