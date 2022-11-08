@@ -74,7 +74,7 @@ export default function ModalScreen({
   };
   const onAdd = () => {
     const newPizza = {
-      name: formValues.name,
+      name: formValues.name || 'Pizza',
       size: Number(formValues.size) || 10,
       amount: Number(formValues.amount) || 1,
       price: Number(formValues.price) || 10,
@@ -105,7 +105,7 @@ export default function ModalScreen({
           }
         />
         <Input
-          label="Size (in)"
+          label="Size (diameter)"
           value={formValues.size}
           onChangeText={(text) =>
             dispatchFormValues({
