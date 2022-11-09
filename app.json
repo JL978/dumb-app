@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "dumb-app",
-    "slug": "dumb-app",
+    "name": "Dumb Reddit Pizza App",
+    "slug": "dumb-reddit-pizza-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -17,13 +17,16 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.dumbredditpizzaapp",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.dumbredditpizzaapp"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
