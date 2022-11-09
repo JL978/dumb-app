@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   FlatList,
+  Image,
 } from 'react-native';
 
 import { Text, useThemeColor, View } from '../components/Themed';
@@ -115,14 +116,18 @@ export default function RootScreen({
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={[styles.icon, { backgroundColor: primaryColor }]}>
+        {/* <View style={[styles.icon, { backgroundColor: primaryColor }]}>
           <Ionicons
             name="pizza"
             style={{ marginTop: 3 }}
             size={40}
             color={'white'}
           />
-        </View>
+        </View> */}
+        <Image
+          source={require('../assets/images/app-icon.png')}
+          style={{ width: 45, height: 45 }}
+        />
         <View style={{ marginLeft: 10 }}>
           <Text style={styles.title}>Dumb Reddit</Text>
           <Text style={styles.title}>Pizza App</Text>
