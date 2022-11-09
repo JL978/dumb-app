@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   TextInputProps,
   TouchableOpacityProps,
+  ScrollView,
 } from 'react-native';
 
 import { Text, useThemeColor, View } from '../components/Themed';
@@ -22,12 +23,19 @@ type InputProps = {
 
 const Input = ({ label, value, onChangeText, ...props }: InputProps) => {
   const inputBackgroundColor = useThemeColor({}, 'inputBackground');
+  const textColor = useThemeColor({}, 'text');
+  const inputLabelColor = useThemeColor({}, 'inputLabelColor');
 
   return (
     <View style={styles.inputContainer}>
-      <Text style={styles.inputLabel}>{label}</Text>
+      <Text style={[styles.inputLabel, { color: inputLabelColor }]}>
+        {label}
+      </Text>
       <TextInput
-        style={[styles.input, { backgroundColor: inputBackgroundColor }]}
+        style={[
+          styles.input,
+          { backgroundColor: inputBackgroundColor, color: textColor },
+        ]}
         value={value}
         onChangeText={onChangeText}
         {...props}
@@ -64,6 +72,7 @@ const formReducer = (state: typeof initialFormValues, action: Action) => {
 export default function ModalScreen({
   navigation,
 }: RootStackScreenProps<'Modal'>) {
+  const textColor = useThemeColor({}, 'text');
   const { addPizza } = usePizzas();
   const [formValues, dispatchFormValues] = useReducer(
     formReducer,
@@ -90,10 +99,10 @@ export default function ModalScreen({
       <View style={styles.header}>
         <Text style={styles.title}>Add Yo Pizza</Text>
         <TouchableOpacity onPress={onClose}>
-          <AntDesign name="close" size={24} color="black" />
+          <AntDesign name="close" size={24} color={textColor} />
         </TouchableOpacity>
       </View>
-      <View style={{ marginTop: 10 }}>
+      <ScrollView style={{ marginTop: 10 }}>
         <Input
           label="Name"
           value={formValues.name}
@@ -106,7 +115,7 @@ export default function ModalScreen({
           }
         />
         <Input
-          label="Size (diameter)"
+          label="Diameter (in)"
           value={formValues.size}
           onChangeText={(text) =>
             dispatchFormValues({
@@ -141,10 +150,10 @@ export default function ModalScreen({
           }
           keyboardType="numeric"
         />
-      </View>
-      <Button onPress={onAdd} style={{ width: '60%' }}>
-        Add
-      </Button>
+        <Button onPress={onAdd} style={{ width: '60%' }}>
+          Add
+        </Button>
+      </ScrollView>
     </View>
   );
 }
@@ -162,7 +171,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
   },
   inputContainer: {
@@ -173,7 +182,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   inputLabel: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
   },

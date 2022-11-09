@@ -1,31 +1,110 @@
 import { useMemo } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+  FlatList,
+} from 'react-native';
 
 import { Text, useThemeColor, View } from '../components/Themed';
 import { RootStackScreenProps } from '../types';
 import usePizzas, { Pizza } from './usePizzas';
 import CurrencyFormat from 'react-currency-format';
-import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
+import {
+  AntDesign,
+  FontAwesome,
+  FontAwesome5,
+  Ionicons,
+} from '@expo/vector-icons';
 import Button from '../components/Button';
 
 function processPizzas(pizzas: Pizza[]) {
   return pizzas
     .map((pizza) => {
-      const area = (pizza.size / 2) ** 2 * Math.PI;
+      const area = (pizza.size / 2) ** 2 * Math.PI * pizza.amount;
       return {
         ...pizza,
         area,
-        priceEff: pizza.price / (area * pizza.amount),
+        priceEff: pizza.price / area,
       };
     })
     .sort((a, b) => a.priceEff - b.priceEff);
 }
 
+const PizzaTile = ({ pizza, isBest }: { pizza: any; isBest?: boolean }) => {
+  const { removePizza } = usePizzas();
+
+  const deleteButtonColor = useThemeColor(
+    { dark: '#b0b0b0', light: '#D7DFE2' },
+    'text'
+  );
+  const tileBackgroundColor = useThemeColor({}, 'tileBackground');
+  return (
+    <View
+      key={pizza.id}
+      style={[styles.pizzaContainer, { backgroundColor: tileBackgroundColor }]}>
+      {isBest && (
+        <View style={styles.bestPizza}>
+          <Text style={styles.bestPizzaText}>Cheapest Pizza Deal!</Text>
+        </View>
+      )}
+      <TouchableOpacity
+        style={[styles.closeButton, { backgroundColor: deleteButtonColor }]}
+        onPress={() => removePizza(pizza.id)}>
+        <AntDesign name="close" size={14} color="#404040" />
+      </TouchableOpacity>
+      <Text style={styles.pizzaTitle}>{pizza.name}</Text>
+
+      <Text style={[styles.pizzaInfoText, { fontSize: 14 }]}>
+        Price Efficiency:{' '}
+        <CurrencyFormat
+          value={pizza.priceEff}
+          displayType={'text'}
+          thousandSeparator={true}
+          prefix={'$'}
+          decimalScale={2}
+          fixedDecimalScale={true}
+          renderText={(value) => (
+            <Text style={{ fontWeight: 'bold' }}>{value}</Text>
+          )}
+          suffix={' / in²'}
+        />
+      </Text>
+
+      <View style={styles.pizzaInfoContainer}>
+        <Text style={styles.pizzaInfoText}>
+          Price:{' '}
+          <CurrencyFormat
+            value={pizza.price}
+            displayType={'text'}
+            thousandSeparator={true}
+            prefix={'$'}
+            decimalScale={2}
+            fixedDecimalScale={true}
+            renderText={(value) => <Text>{value}</Text>}
+          />
+        </Text>
+        <Text style={styles.pizzaInfoText}>
+          Total Area: {pizza.area.toFixed(1)} in²
+        </Text>
+        <Text style={styles.pizzaInfoText}>Amount: {pizza.amount}</Text>
+      </View>
+    </View>
+  );
+};
+
 export default function RootScreen({
   navigation,
 }: RootStackScreenProps<'Root'>) {
-  const textColor = useThemeColor({}, 'text');
-  const { pizzas, removePizza } = usePizzas();
+  const deleteButtonColor = useThemeColor(
+    { dark: '#b0b0b0', light: '#D7DFE2' },
+    'text'
+  );
+  const primaryColor = useThemeColor({}, 'primary');
+  const disabledTextColor = useThemeColor({}, 'textDisabled');
+  const tileBackgroundColor = useThemeColor({}, 'tileBackground');
+
+  const { pizzas } = usePizzas();
 
   const processedPizzas = useMemo(() => processPizzas(pizzas), [pizzas]);
 
@@ -34,84 +113,68 @@ export default function RootScreen({
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Ionicons name="pizza" size={50} color={textColor} />
+        <View style={[styles.icon, { backgroundColor: primaryColor }]}>
+          <Ionicons
+            name="pizza"
+            style={{ marginTop: 3 }}
+            size={40}
+            color={'white'}
+          />
+        </View>
         <View style={{ marginLeft: 10 }}>
           <Text style={styles.title}>Dumb Reddit</Text>
-          <Text style={styles.title}>Pizza Efficiency App</Text>
+          <Text style={styles.title}>Pizza App</Text>
         </View>
       </View>
       {processedPizzas?.length === 0 ? (
         <View style={styles.emptyStateContainer}>
-          <Text style={styles.title}>You got no pizza, dawg</Text>
+          <FontAwesome5
+            name="pizza-slice"
+            style={{ marginBottom: 30, marginTop: 130 }}
+            size={80}
+            color={disabledTextColor}
+          />
+          <Text
+            style={{
+              fontWeight: 'bold',
+              fontSize: 25,
+              color: disabledTextColor,
+            }}>
+            You got no pizza, dawg
+          </Text>
           <Button onPress={openModal}>Add</Button>
         </View>
       ) : (
         <View style={styles.nonEmptyStateContainer}>
-          {processedPizzas?.map((pizza, index) => (
-            <View key={pizza.id} style={styles.pizzaContainer}>
-              {index === 0 && (
-                <View style={styles.bestPizza}>
-                  <Text style={styles.bestPizzaText}>Cheapest Pizza Deal!</Text>
-                </View>
-              )}
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => removePizza(pizza.id)}>
-                <AntDesign name="close" size={14} color="#404040" />
-              </TouchableOpacity>
-              <Text style={styles.pizzaTitle}>{pizza.name}</Text>
-
-              <Text style={[styles.pizzaInfoText, { fontSize: 14 }]}>
-                Price Efficiency:{' '}
-                <CurrencyFormat
-                  value={pizza.priceEff}
-                  displayType={'text'}
-                  thousandSeparator={true}
-                  prefix={'$'}
-                  decimalScale={2}
-                  fixedDecimalScale={true}
-                  renderText={(value) => (
-                    <Text style={{ fontWeight: 'bold' }}>{value}</Text>
-                  )}
-                  suffix={' / in²'}
-                />
-              </Text>
-
-              <View style={styles.pizzaInfoContainer}>
-                <Text style={styles.pizzaInfoText}>
-                  Price:{' '}
-                  <CurrencyFormat
-                    value={pizza.price}
-                    displayType={'text'}
-                    thousandSeparator={true}
-                    prefix={'$'}
-                    decimalScale={2}
-                    fixedDecimalScale={true}
-                    renderText={(value) => <Text>{value}</Text>}
-                  />
-                </Text>
-                <Text style={styles.pizzaInfoText}>
-                  Area: {pizza.area.toFixed(1)} in²
-                </Text>
-                <Text style={styles.pizzaInfoText}>Amount: {pizza.amount}</Text>
-              </View>
-            </View>
-          ))}
+          <FlatList
+            data={processedPizzas}
+            renderItem={({ item, index }) => (
+              <PizzaTile pizza={item} isBest={index === 0} />
+            )}
+            keyExtractor={(item) => item.id}
+          />
+          {/* {processedPizzas?.map((pizza, index) => (
+            <PizzaTile pizza={pizza} isBest={index === 0} />
+          ))} */}
           <Button onPress={openModal} style={styles.button}>
-            <FontAwesome name="plus" size={22} color="white" />
+            <FontAwesome
+              name="plus"
+              style={{ marginTop: 2 }}
+              size={26}
+              color="white"
+            />
           </Button>
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: 40,
-    paddingBottom: 20,
+    paddingVertical: 20,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 18,
@@ -122,13 +185,19 @@ const styles = StyleSheet.create({
   emptyStateContainer: {
     flex: 1,
     alignItems: 'center',
+  },
+  icon: {
+    backgroundColor: '#fff',
+    borderRadius: 50,
+    width: 50,
+    height: 50,
+    alignItems: 'center',
     justifyContent: 'center',
   },
   closeButton: {
     position: 'absolute',
     top: 10,
     right: 10,
-    backgroundColor: '#D7DFE2',
     borderRadius: 1000,
     width: 20,
     height: 20,
@@ -136,12 +205,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   button: {
-    height: 40,
-    width: 40,
+    height: 60,
+    width: 60,
     paddingHorizontal: 0,
     paddingVertical: 0,
     position: 'absolute',
-    bottom: 50,
+    bottom: 30,
   },
   container: {
     flex: 1,
@@ -151,7 +220,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   title: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   separator: {
@@ -163,7 +232,6 @@ const styles = StyleSheet.create({
     paddingTop: 25,
     paddingBottom: 20,
     paddingHorizontal: 20,
-    backgroundColor: 'white',
     borderRadius: 10,
     marginVertical: 10,
     marginHorizontal: 20,
@@ -181,7 +249,7 @@ const styles = StyleSheet.create({
   pizzaInfoContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
   },
   pizzaInfoText: {
     fontSize: 12,
